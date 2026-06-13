@@ -23,6 +23,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/register").permitAll()
+                .requestMatchers("/register/restaurant").permitAll()
+                .requestMatchers("/register/ngo").permitAll()
                 .requestMatchers("/login").permitAll()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
