@@ -29,4 +29,9 @@ public class UserController {
         LoginResponseDTO response = userService.loginUser(loginRequest);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser() {
+        return ResponseEntity.ok("Logged out successfully");
+    }
 }

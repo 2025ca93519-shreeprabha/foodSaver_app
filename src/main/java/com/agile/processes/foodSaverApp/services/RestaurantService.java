@@ -1,6 +1,7 @@
 package com.agile.processes.foodSaverApp.services;
 
 import com.agile.processes.foodSaverApp.dtos.RestaurantRegisterRequestDTO;
+import com.agile.processes.foodSaverApp.dtos.RestaurantResponseDTO;
 import com.agile.processes.foodSaverApp.entities.Restaurant;
 import com.agile.processes.foodSaverApp.entities.User;
 import com.agile.processes.foodSaverApp.enums.Role;
@@ -9,6 +10,9 @@ import com.agile.processes.foodSaverApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RestaurantService {
@@ -39,5 +43,18 @@ public class RestaurantService {
         restaurant.setPhone(request.getPhone());
 
         return restaurantRepository.save(restaurant);
+    }
+
+    public List<RestaurantResponseDTO> getAllRestaurants() {
+        return restaurantRepository.findAll().stream()
+                .map(r -> new RestaurantResponseDTO(
+                        r.getId(),
+                        r.getUser().getId(),
+                        r.getName(),
+                        r.getAddress(),
+                        r.getPhone(),
+                        r.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
     }
 }
