@@ -21,4 +21,6 @@ public class RestaurantController {
         restaurantService.registerRestaurant(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("Restaurant registered successfully");
     }
+
+    
 }

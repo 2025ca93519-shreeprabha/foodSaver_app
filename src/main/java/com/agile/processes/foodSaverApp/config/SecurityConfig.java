@@ -26,6 +26,8 @@ public class SecurityConfig {
                 .requestMatchers("/register/restaurant").permitAll()
                 .requestMatchers("/register/ngo").permitAll()
                 .requestMatchers("/login").permitAll()
+                .requestMatchers("/food", "/food/**").permitAll()
+                .requestMatchers("/restaurants/*/food").permitAll()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
             );
