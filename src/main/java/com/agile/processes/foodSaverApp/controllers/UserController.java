@@ -4,7 +4,10 @@ import com.agile.processes.foodSaverApp.dtos.LoginRequestDTO;
 import com.agile.processes.foodSaverApp.dtos.LoginResponseDTO;
 import com.agile.processes.foodSaverApp.dtos.RegisterRequestDTO;
 import com.agile.processes.foodSaverApp.services.UserService;
+import com.agile.processes.foodSaverApp.entities.User;
 import jakarta.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +23,11 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequestDTO registerRequest) {
-        userService.registerUser(registerRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+        User user = userService.registerUser(registerRequest);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "User registered successfully");
+        response.put("userId", user.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")

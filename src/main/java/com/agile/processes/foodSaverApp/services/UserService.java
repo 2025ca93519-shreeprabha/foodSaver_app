@@ -18,7 +18,7 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public void registerUser(RegisterRequestDTO request) {
+    public User registerUser(RegisterRequestDTO request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email is already in use");
         }
@@ -29,7 +29,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
 
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     public LoginResponseDTO loginUser(LoginRequestDTO request) {
