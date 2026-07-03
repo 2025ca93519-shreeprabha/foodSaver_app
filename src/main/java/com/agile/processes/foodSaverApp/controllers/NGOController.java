@@ -3,6 +3,7 @@ package com.agile.processes.foodSaverApp.controllers;
 import com.agile.processes.foodSaverApp.dtos.NGORegisterRequestDTO;
 import com.agile.processes.foodSaverApp.dtos.PickupRequestDTO;
 import com.agile.processes.foodSaverApp.dtos.PickupResponseDTO;
+import com.agile.processes.foodSaverApp.dtos.NGOResponseDTO;
 import com.agile.processes.foodSaverApp.services.NGOService;
 import com.agile.processes.foodSaverApp.services.PickupService;
 import jakarta.validation.Valid;
@@ -47,5 +48,15 @@ public class NGOController {
     public ResponseEntity<List<PickupResponseDTO>> getPickupsByNgo(@PathVariable Long ngoId) {
         List<PickupResponseDTO> pickups = pickupService.getPickupsByNgo(ngoId);
         return ResponseEntity.ok(pickups);
+    }
+
+    /**
+     * View all registered NGOs.
+     * GET /ngos
+     */
+    @GetMapping("/ngos")
+    public ResponseEntity<List<NGOResponseDTO>> getAllNgos() {
+        List<NGOResponseDTO> ngos = ngoService.getAllNgos();
+        return ResponseEntity.ok(ngos);
     }
 }

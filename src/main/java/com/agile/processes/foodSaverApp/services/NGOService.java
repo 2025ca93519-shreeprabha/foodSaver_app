@@ -9,6 +9,10 @@ import com.agile.processes.foodSaverApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.agile.processes.foodSaverApp.dtos.NGOResponseDTO;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class NGOService {
@@ -39,5 +43,18 @@ public class NGOService {
         ngo.setPhone(request.getPhone());
 
         return ngoRepository.save(ngo);
+    }
+
+    public List<NGOResponseDTO> getAllNgos() {
+        return ngoRepository.findAll().stream()
+                .map(ngo -> new NGOResponseDTO(
+                        ngo.getId(),
+                        ngo.getUser().getId(),
+                        ngo.getName(),
+                        ngo.getAddress(),
+                        ngo.getPhone(),
+                        ngo.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
     }
 }

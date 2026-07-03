@@ -40,6 +40,6 @@ public class UserService {
             throw new IllegalArgumentException("Invalid email or password");
         }
 
-        return new LoginResponseDTO("Login successful", user.getName(), user.getEmail(), user.getRole());
+        return new LoginResponseDTO(user.getId(), "Login successful", user.getName(), user.getEmail(), user.getRole());
     }
 }

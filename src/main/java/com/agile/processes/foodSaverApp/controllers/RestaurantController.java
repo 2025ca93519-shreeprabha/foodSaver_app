@@ -5,7 +5,10 @@ import com.agile.processes.foodSaverApp.dtos.RestaurantRegisterRequestDTO;
 import com.agile.processes.foodSaverApp.dtos.RestaurantResponseDTO;
 import com.agile.processes.foodSaverApp.services.PickupService;
 import com.agile.processes.foodSaverApp.services.RestaurantService;
+import com.agile.processes.foodSaverApp.entities.Restaurant;
 import jakarta.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +27,11 @@ public class RestaurantController {
 
     @PostMapping("/register/restaurant")
     public ResponseEntity<?> registerRestaurant(@Valid @RequestBody RestaurantRegisterRequestDTO request) {
-        restaurantService.registerRestaurant(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Restaurant registered successfully");
+        Restaurant restaurant = restaurantService.registerRestaurant(request);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Restaurant registered successfully");
+        response.put("restaurantId", restaurant.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/restaurants")

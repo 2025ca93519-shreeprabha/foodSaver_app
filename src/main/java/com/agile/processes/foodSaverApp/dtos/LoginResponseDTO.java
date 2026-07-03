@@ -5,12 +5,14 @@ import lombok.Data;
 
 @Data
 public class LoginResponseDTO {
+    private Long userId;
     private String message;
     private String name;
     private String email;
     private Role role;
 
-    public LoginResponseDTO(String message, String name, String email, Role role) {
+    public LoginResponseDTO(Long userId, String message, String name, String email, Role role) {
+        this.userId = userId;
         this.message = message;
         this.name = name;
         this.email = email;
