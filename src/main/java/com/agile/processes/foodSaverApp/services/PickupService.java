@@ -33,6 +33,9 @@ public class PickupService {
     @Autowired
     private RestaurantRepository restaurantRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     /**
      * Creates a pickup request for an NGO selecting a specific food item and quantity.
      * Validates that:
@@ -75,6 +78,15 @@ public class PickupService {
         pickupRequest.setStatus(PickupStatus.PENDING);
 
         PickupRequest saved = pickupRequestRepository.save(pickupRequest);
+
+        // Notify the restaurant about the pickup request
+        String message = String.format("NGO %s requested a pickup of %d %s of %s.",
+                ngo.getName(),
+                request.getRequestedQuantity(),
+                food.getQuantityUnit(),
+                food.getName());
+        notificationService.createNotification(food.getRestaurant(), message);
+
         return mapPickupToDTO(saved);
     }
 
