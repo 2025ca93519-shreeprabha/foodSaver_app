@@ -116,6 +116,97 @@ public class PickupService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Updates the status of a pickup request by the Restaurant.
+     * Validates that the pickup request belongs to the restaurant's food.
+     * If the new status is CANCELLED:
+     * - Restores the requested quantity back to the Food item.
+     * - Reverts the Food status to AVAILABLE if it was CLAIMED.
+     */
+    @Transactional
+    public PickupResponseDTO updateStatusByRestaurant(Long restaurantId, Long pickupId, PickupStatus status) {
+        if (!restaurantRepository.existsById(restaurantId)) {
+            throw new IllegalArgumentException("Restaurant not found with id: " + restaurantId);
+        }
+
+        PickupRequest pickupRequest = pickupRequestRepository.findById(pickupId)
+                .orElseThrow(() -> new IllegalArgumentException("Pickup request not found with id: " + pickupId));
+
+        if (!pickupRequest.getFood().getRestaurant().getId().equals(restaurantId)) {
+            throw new IllegalArgumentException("Pickup request does not belong to this restaurant");
+        }
+
+        if (pickupRequest.getStatus() != PickupStatus.PENDING) {
+            throw new IllegalArgumentException("Cannot update status of a " + pickupRequest.getStatus() + " pickup request");
+        }
+
+        if (status != PickupStatus.COMPLETED && status != PickupStatus.CANCELLED) {
+            throw new IllegalArgumentException("Invalid status update for restaurant. Must be COMPLETED or CANCELLED");
+        }
+
+        pickupRequest.setStatus(status);
+
+        if (status == PickupStatus.CANCELLED) {
+            Food food = pickupRequest.getFood();
+            food.setQuantity(food.getQuantity() + pickupRequest.getRequestedQuantity());
+            if (food.getStatus() == FoodStatus.CLAIMED) {
+                food.setStatus(FoodStatus.AVAILABLE);
+            }
+            foodRepository.save(food);
+        }
+
+        PickupRequest saved = pickupRequestRepository.save(pickupRequest);
+        return mapPickupToDTO(saved);
+    }
+
+    /**
+     * Updates the status of a pickup request by the NGO.
+     * Validates that the pickup request belongs to the NGO.
+     * Only allows setting the status to CANCELLED.
+     * Restores the requested quantity back to the Food item.
+     * Reverts the Food status to AVAILABLE if it was CLAIMED.
+     * Notifies the restaurant.
+     */
+    @Transactional
+    public PickupResponseDTO updateStatusByNGO(Long ngoId, Long pickupId, PickupStatus status) {
+        if (!ngoRepository.existsById(ngoId)) {
+            throw new IllegalArgumentException("NGO not found with id: " + ngoId);
+        }
+
+        PickupRequest pickupRequest = pickupRequestRepository.findById(pickupId)
+                .orElseThrow(() -> new IllegalArgumentException("Pickup request not found with id: " + pickupId));
+
+        if (!pickupRequest.getNgo().getId().equals(ngoId)) {
+            throw new IllegalArgumentException("Pickup request does not belong to this NGO");
+        }
+
+        if (pickupRequest.getStatus() != PickupStatus.PENDING) {
+            throw new IllegalArgumentException("Cannot update status of a " + pickupRequest.getStatus() + " pickup request");
+        }
+
+        if (status != PickupStatus.CANCELLED) {
+            throw new IllegalArgumentException("NGO can only cancel a pickup request");
+        }
+
+        pickupRequest.setStatus(status);
+
+        Food food = pickupRequest.getFood();
+        food.setQuantity(food.getQuantity() + pickupRequest.getRequestedQuantity());
+        if (food.getStatus() == FoodStatus.CLAIMED) {
+            food.setStatus(FoodStatus.AVAILABLE);
+        }
+        foodRepository.save(food);
+
+        // Notify Restaurant
+        String message = String.format("NGO %s cancelled the pickup request for %s.",
+                pickupRequest.getNgo().getName(),
+                food.getName());
+        notificationService.createNotification(food.getRestaurant(), message);
+
+        PickupRequest saved = pickupRequestRepository.save(pickupRequest);
+        return mapPickupToDTO(saved);
+    }
+
     private PickupResponseDTO mapPickupToDTO(PickupRequest pr) {
         return new PickupResponseDTO(
                 pr.getId(),
