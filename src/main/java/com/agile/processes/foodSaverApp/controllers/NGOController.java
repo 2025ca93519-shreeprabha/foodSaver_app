@@ -7,6 +7,9 @@ import com.agile.processes.foodSaverApp.dtos.NGOResponseDTO;
 import com.agile.processes.foodSaverApp.services.NGOService;
 import com.agile.processes.foodSaverApp.services.PickupService;
 import jakarta.validation.Valid;
+import com.agile.processes.foodSaverApp.entities.NGO;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +28,11 @@ public class NGOController {
 
     @PostMapping("/register/ngo")
     public ResponseEntity<?> registerNGO(@Valid @RequestBody NGORegisterRequestDTO request) {
-        ngoService.registerNGO(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body("NGO registered successfully");
+        NGO ngo = ngoService.registerNGO(request);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "NGO registered successfully");
+        response.put("ngoId", ngo.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**
