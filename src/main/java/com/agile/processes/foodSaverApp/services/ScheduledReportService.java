@@ -34,7 +34,7 @@ public class ScheduledReportService {
 
     @Autowired
     private EmailService emailService;
-‹
+
     // Runs on the 1st of every month at 1:00 AM
     @Scheduled(cron = "0 0 1 1 * ?")
     public void generateAndSendMonthlyReports() {
